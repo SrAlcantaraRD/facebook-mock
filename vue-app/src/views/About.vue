@@ -6,7 +6,7 @@
     <i class="pi pi-check" style="font-size: 2rem"></i>
     <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
     <Calendar v-model="value" :inline="true" />
-    <Button label="Submit" @click="handleClick(value)" />
+    <Button label="Submit" @click="handleClick" />
 
     <p>{{ value }}</p>
     <p>{{ clicks }}</p>
@@ -14,24 +14,39 @@
 </template>
 
 <script lang="ts">
-import Calendar from "primevue/calendar";
-import { Options, Vue } from "vue-class-component";
 import Button from "primevue/button";
+import Calendar from "primevue/calendar";
+import { defineComponent } from "vue";
+import { useStore } from "vuex";
 
-@Options({
+export default defineComponent({
+  name: "AboutPage",
   components: {
     Calendar,
     Button,
   },
-})
-export default class About extends Vue {
-  message = "Hello World!";
-  value = null;
-  clicks = 0;
+  computed: {
+    clicks() {
+      return this.$store.getters.getClicks;
+    },
+    // value() {
+    //   const store = useStore();
 
-  handleClick = (value: string) => {
-    this.clicks++;
-    console.log({ cli: this.clicks });
-  };
-}
+    //   return store.getters.getAddress;
+    // },
+  },
+  // props: {
+  //   message: String,
+  // },
+  data() {
+    return {
+      value: null,
+    };
+  },
+  methods: {
+    handleClick() {
+      this.$store.dispatch("increaseClicks");
+    },
+  },
+});
 </script>

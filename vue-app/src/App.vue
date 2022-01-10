@@ -10,15 +10,12 @@
     <p>{{ text }}</p>
   </div>
   <div class="p-d-flex">
-    <div class="p-mr-2 p-order-3 p-order-md-2">Item 1</div>
-    <div class="p-mr-2 p-order-1 p-order-md-3">Item 2</div>
-    <div class="p-mr-2 p-order-2 p-order-md-1">Item 3</div>
+    <div class="p-mr-2 p-order-3 p-order-md-2">{{ address }}</div>
   </div>
 </template>
 
-<script>
-import Vue from "vue";
-console.log({ Vue });
+<script lang="ts">
+// import Vue from "vue";
 // const state = new Vue.observable({
 //   name: "John Doe",
 //   email: "fake@email.com",
@@ -30,6 +27,11 @@ export default {
     return {
       value: null,
     };
+  },
+  computed: {
+    address() {
+      return this.$store.state.address;
+    },
   },
 };
 </script>
