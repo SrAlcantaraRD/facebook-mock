@@ -1,60 +1,57 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-    <InputText type="text" v-model="text" />
+  <AppBar />
+  <div class="block font-bold text-center p-4 border-round mb-3">
+    <router-view />
   </div>
-  <router-view />
-  <div class="card">
-    <InputText type="text" v-model="text" class="p-ml-2 p-d-inline" />
-    <p>{{ text }}</p>
-  </div>
-  <div class="p-d-flex">
-    <div class="p-mr-2 p-order-3 p-order-md-2">{{ address }}</div>
-  </div>
+  <vue-metamask userMessage="msg" @onComplete="onComplete"> </vue-metamask>
 </template>
 
 <script lang="ts">
-// import Vue from "vue";
-// const state = new Vue.observable({
-//   name: "John Doe",
-//   email: "fake@email.com",
-//   username: "jd123",
-// });
+import AppBar from "@/components/AppBar.vue";
+import Web3 from "web3";
+// import VueMetamask from "vue-metamask";
+
+const loadWeb3 = async () => {
+  // const _web3 = new Web3(window.ethereum);
+  // window.web3 = _web3;
+  // await window.ethereum.enable();
+  // var _web3 = new Web3(useLocalProvider ? web3Provider : Web3.givenProvider);
+  // console.log({ _web3 });
+  // if (_web3) setWeb3(_web3);
+};
+
+loadWeb3();
 
 export default {
+  components: {
+    AppBar,
+    // VueMetamask,
+  },
   data() {
     return {
-      value: null,
+      msg: "This is demo net work",
     };
   },
-  computed: {
-    address() {
-      return this.$store.state.address;
+  methods: {
+    onComplete(data: any) {
+      console.log("data:", data);
     },
   },
 };
 </script>
 
 <style>
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  max-height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
 }
 </style>

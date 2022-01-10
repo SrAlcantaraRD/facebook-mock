@@ -14,17 +14,10 @@
 </template>
 
 <script lang="ts">
-import Button from "primevue/button";
-import Calendar from "primevue/calendar";
 import { defineComponent } from "vue";
-import { useStore } from "vuex";
 
 export default defineComponent({
   name: "AboutPage",
-  components: {
-    Calendar,
-    Button,
-  },
   computed: {
     clicks() {
       return this.$store.getters.getClicks;

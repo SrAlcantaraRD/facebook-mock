@@ -1,4 +1,4 @@
-import { createStore, Store } from "vuex";
+import { createStore } from "vuex";
 
 export const store = createStore({
   state: {
@@ -30,7 +30,3 @@ export const store = createStore({
   },
   modules: {},
 });
-
-// export function useStore(): Store {
-//   return store as Store;
-// }
