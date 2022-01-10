@@ -27,6 +27,9 @@ export const store = createStore({
 
       commit("setClicks", clicks);
     },
+    reportAddress({ commit, state }, { address }) {
+      commit("setAddress", address);
+    },
   },
   modules: {},
 });
