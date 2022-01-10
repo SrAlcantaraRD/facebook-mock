@@ -3,11 +3,12 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "compile": "npx hardhat compile",
+    "compile": "yarn test && npx hardhat compile",
     "test": "npx hardhat test",
     "deploy": "yarn compile && npx hardhat run scripts/deploy.ts --network localhost",
     "start-serve": "npx hardhat node",
-    "start-front": "cd vue-app/ && yarn serve"
+    "start-front": "cd vue-app/ && yarn serve",
+    "open-console": " npx hardhat console"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
