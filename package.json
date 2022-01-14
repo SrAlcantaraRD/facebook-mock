@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "compile": "yarn test && npx hardhat compile",
+    "compile": "npx hardhat compile && yarn test",
     "test": "npx hardhat test",
     "deploy": "yarn compile && npx hardhat run scripts/deploy.ts --network localhost",
     "start-serve": "npx hardhat node",
@@ -41,5 +41,8 @@
     "ts-node": "^10.4.0",
     "typechain": "^5.2.0",
     "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "chai-as-promised": "^7.1.1"
   }
 }
