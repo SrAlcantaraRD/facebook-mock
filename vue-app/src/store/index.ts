@@ -1,9 +1,21 @@
+import { Decentragram } from "@contracts/Decentragram";
 import { createStore } from "vuex";
+// import { ethers } from "ethers";
+// import DecentragramContract from "@/types/artifacts/Decentragram.json";
 
-export const store = createStore({
+// console.log({ DecentragramContract });
+
+interface IStore {
+  address: string;
+  clicks: number;
+  decentragram: Decentragram;
+}
+
+export const store = createStore<IStore>({
   state: {
     address: "0x0",
     clicks: 1,
+    decentragram: null,
   },
   mutations: {
     setAddress(state, _address: string) {
@@ -11,6 +23,9 @@ export const store = createStore({
     },
     setClicks(state) {
       state.clicks++;
+    },
+    setDecentragram(state, _decentragram: Decentragram) {
+      state.decentragram = _decentragram;
     },
   },
   getters: {
@@ -20,6 +35,9 @@ export const store = createStore({
     getClicks(state) {
       return state.clicks;
     },
+    setDecentragram(state) {
+      return state.decentragram;
+    },
   },
   actions: {
     increaseClicks({ commit, state }) {
@@ -27,7 +45,7 @@ export const store = createStore({
 
       commit("setClicks", clicks);
     },
-    reportAddress({ commit, state }, { address }) {
+    reportAddress({ commit }, { address }) {
       commit("setAddress", address);
     },
   },
