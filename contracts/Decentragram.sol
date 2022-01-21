@@ -25,6 +25,14 @@ contract Decentragram {
         address payable autor
     );
 
+    event ImageTipped(
+        uint256 id,
+        string hash,
+        string description,
+        uint256 tipAmount,
+        address payable autor
+    );
+
     // constructor() {
     //     console.log("Deploying a Greeter with greeting:");
     // }
@@ -33,9 +41,8 @@ contract Decentragram {
     function uploadImages(string memory _hash, string memory _description)
         public
     {
-        require(bytes(_description).length > 0);
-        require(bytes(_hash).length > 0);
-        require(msg.sender != address(0x0));
+        require(bytes(_description).length > 0, "Define a 'description'");
+        require(bytes(_hash).length > 0, "Define a 'hash'");
 
         images[imageCounter] = Image(
             imageCounter,
@@ -57,6 +64,29 @@ contract Decentragram {
     }
 
     // Crear imagen
+    function tipImageOwner(uint256 _id) public payable {
+        require(_id >= 0, "Image ID cannot be lower than 0");
+        require(_id < imageCounter, "Image ID not available");
 
-    // Obtener imagen
+        // Obtener la imagen
+        Image memory _image = images[_id];
+
+        // Obtener el autor de la imagen
+        address payable _autor = _image.autor;
+
+        _image.tipAmount += msg.value;
+        images[_id] = _image;
+
+        // Pagar al autor
+        _autor.transfer(msg.value);
+
+        emit ImageTipped(
+            _image.id,
+            _image.hash,
+            _image.description,
+            _image.tipAmount,
+            payable(msg.sender)
+        );
+    }
+
 }
