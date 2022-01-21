@@ -1,5 +1,6 @@
 import { Decentragram } from "@contracts/Decentragram";
 import { createStore } from "vuex";
+import Web3 from "web3";
 // import { ethers } from "ethers";
 // import DecentragramContract from "@/types/artifacts/Decentragram.json";
 
@@ -9,6 +10,7 @@ interface IStore {
   address: string;
   clicks: number;
   decentragram: Decentragram;
+  error: string;
 }
 
 export const store = createStore<IStore>({
@@ -16,6 +18,7 @@ export const store = createStore<IStore>({
     address: "0x0",
     clicks: 1,
     decentragram: null,
+    error: null,
   },
   mutations: {
     setAddress(state, _address: string) {
@@ -27,6 +30,9 @@ export const store = createStore<IStore>({
     setDecentragram(state, _decentragram: Decentragram) {
       state.decentragram = _decentragram;
     },
+    setError(state, _error: string) {
+      state.error = _error;
+    },
   },
   getters: {
     getAddress(state) {
@@ -35,8 +41,11 @@ export const store = createStore<IStore>({
     getClicks(state) {
       return state.clicks;
     },
-    setDecentragram(state) {
+    getDecentragram(state) {
       return state.decentragram;
+    },
+    getError(state) {
+      return state.error;
     },
   },
   actions: {
@@ -45,9 +54,47 @@ export const store = createStore<IStore>({
 
       commit("setClicks", clicks);
     },
-    reportAddress({ commit }, { address }) {
+    async connect({ commit, dispatch }, { connect }) {
+      try {
+        const { ethereum } = window;
+
+        if (!ethereum) {
+          commit("setError", "Metamask not installed!");
+          return;
+        }
+
+        if (!(await dispatch("checkIfConnected")) && connect) {
+          await dispatch("requestAccess");
+        }
+      } catch (error) {
+        console.log(error);
+        commit("setError", "Account request refused.");
+      }
+    },
+    async checkIfConnected({ commit }) {
+      const { ethereum } = window;
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+
+      if (accounts.length === 0) return false;
+
+      commit("setAddress", accounts[0]);
+
+      return true;
+    },
+    async requestAccess({ commit }) {
+      const { ethereum } = window;
+
+      const [address] = await ethereum.enable();
+
       commit("setAddress", address);
     },
   },
   modules: {},
 });
+
+declare global {
+  interface Window {
+    ethereum: any;
+    web3: Web3;
+  }
+}
