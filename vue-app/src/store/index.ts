@@ -69,6 +69,10 @@ export const store = createStore<IStore>({
           await dispatch("requestAccess");
         }
 
+        window.ethereum.on("accountsChanged", async () => {
+          await dispatch("loadSmartContractData");
+          await dispatch("buildDecentragram");
+        });
         console.log("¡Conectado!");
 
         await dispatch("loadSmartContractData");
@@ -111,7 +115,11 @@ export const store = createStore<IStore>({
 
 declare global {
   interface Window {
-    ethereum: ethers.providers.ExternalProvider;
+    ethereum: ICustomExternalProvider;
     web3: Web3;
   }
+}
+
+interface ICustomExternalProvider extends ethers.providers.ExternalProvider {
+  on: (event: string, callback: (...args: any[]) => void) => void;
 }
