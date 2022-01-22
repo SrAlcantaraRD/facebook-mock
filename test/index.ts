@@ -22,6 +22,9 @@ describe("Decentragram", function () {
 
     deployer = await decentragram.address;
     [author, tipper] = await ethers.getSigners();
+
+    const imageCount = await decentragram.imageCounter();
+    console.log({ imageCount });
   });
 
   it("Deployment succesfully", async () => {

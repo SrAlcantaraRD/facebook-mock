@@ -1,35 +1,27 @@
+import DecentragramContract from "@/utils/smarthContracts/Decentragram.sol/Decentragram.json";
 import { Decentragram } from "@contractsTypes/Decentragram";
-import { ethers, Signer } from "ethers";
+import { ethers } from "ethers";
 import { createStore } from "vuex";
 import Web3 from "web3";
 
-// console.log({ DecentragramContract });
+const { VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS } = process.env;
 
 interface IStore {
   signerAddress: string;
-  signer: Signer;
-  provider: ethers.providers.Web3Provider;
   clicks: number;
   decentragram: Decentragram;
   error: string;
 }
+const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
 
 export const store = createStore<IStore>({
   state: {
-    signer: null,
     clicks: 1,
-    provider: null,
     decentragram: null,
     error: null,
     signerAddress: null,
   },
   mutations: {
-    async setSigner(state, _signer: Signer) {
-      const address = await _signer.getAddress();
-
-      state.signer = _signer;
-      state.signerAddress = address;
-    },
     setClicks(state) {
       state.clicks++;
     },
@@ -39,14 +31,11 @@ export const store = createStore<IStore>({
     setError(state, _error: string) {
       state.error = _error;
     },
-    setProvider(state, _provider: ethers.providers.Web3Provider) {
-      state.provider = _provider;
+    setSignerAddress(state, _signerAddress: string) {
+      state.signerAddress = _signerAddress;
     },
   },
   getters: {
-    getSigner({ signer }) {
-      return signer;
-    },
     getClicks({ clicks }) {
       return clicks;
     },
@@ -55,9 +44,6 @@ export const store = createStore<IStore>({
     },
     getError({ error }) {
       return error;
-    },
-    getProvider({ provider }) {
-      return provider;
     },
     getSignerAddress({ signerAddress }) {
       return signerAddress;
@@ -69,7 +55,7 @@ export const store = createStore<IStore>({
 
       commit("setClicks", clicks);
     },
-    async connect({ commit, dispatch }, { connect }) {
+    async connect({ commit, dispatch }) {
       try {
         const { ethereum } = window;
 
@@ -78,50 +64,46 @@ export const store = createStore<IStore>({
           return;
         }
 
-        if (await dispatch("checkIfConnected")) {
-          await dispatch("buildDecentragram");
-          return;
+        if (!(await dispatch("checkIfConnected"))) {
+          console.log("Conectado...");
+          await dispatch("requestAccess");
         }
 
-        if (connect) {
-          await dispatch("requestAccess");
-          return;
-        }
+        console.log("¡Conectado!");
+
+        await dispatch("loadSmartContractData");
+        await dispatch("buildDecentragram");
 
         commit("setError", "Execute connection to ethereum process.");
-        throw "Execute connection to ethereum process";
-
-        // TODO: Crear contrato con Decentragram.sol
       } catch (error) {
         console.log(error);
         commit("setError", "Account request refused.");
       }
     },
-    async checkIfConnected({ commit, state: { provider } }) {
-      const _provider =
-        provider || new ethers.providers.Web3Provider(window.ethereum);
-
-      const { _address } = _provider.getSigner();
-
-      if (!provider) commit("setProvider", _provider);
-
-      return !!_address;
-    },
-    async requestAccess({ commit, dispatch, state: { provider } }) {
-      await provider.send("eth_requestAccounts", []);
-
-      const signer = provider.getSigner();
-
-      commit("setSigner", signer);
-
-      await dispatch("buildDecentragram");
-    },
-    async requestAccess({ commit }) {
+    async checkIfConnected() {
       const { ethereum } = window;
+      const accounts = await ethereum.request({ method: "eth_accounts" });
 
-      const [address] = await ethereum.enable();
+      return accounts.length > 0;
+    },
+    async requestAccess() {
+      await PROVIDER.send("eth_requestAccounts", []);
+    },
+    async loadSmartContractData({ commit }) {
+      const signer = PROVIDER.getSigner();
+      const address = await signer.getAddress();
 
-      commit("setAddress", address);
+      const decentragramContract = new ethers.Contract(
+        VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS,
+        DecentragramContract.abi,
+        signer
+      );
+
+      const images = await decentragramContract.functions.imageCounter();
+      console.log(images);
+
+      commit("setDecentragram", decentragramContract);
+      commit("setSignerAddress", address);
     },
   },
   modules: {},
@@ -129,7 +111,7 @@ export const store = createStore<IStore>({
 
 declare global {
   interface Window {
-    ethereum: any;
+    ethereum: ethers.providers.ExternalProvider;
     web3: Web3;
   }
 }

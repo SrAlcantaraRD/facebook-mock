@@ -26,6 +26,11 @@ export default defineComponent({
     address() {
       return this.$store.getters.getSignerAddress;
     },
+    decentragram() {
+      console.log("klk");
+
+      return this.$store.getters.getDecentragram;
+    },
   },
 });
 </script>

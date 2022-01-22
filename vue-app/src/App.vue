@@ -21,11 +21,6 @@ export default {
   async mounted() {
     await this.$store.dispatch("connect", { connect: true });
   },
-  methods: {
-    async connect() {
-      await this.$store.dispatch("connect", { connect: true });
-    },
-  },
 };
 </script>
 
