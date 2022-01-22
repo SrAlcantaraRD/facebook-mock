@@ -11,7 +11,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "baseUrl": "./",
     "types": [
       "webpack-env"
     ],
@@ -19,8 +20,12 @@
       "@/*": [
         "src/*"
       ],
-      "@contracts/*": [
+      "@contractsTypes/*": [
         "@/../../typechain/*"
+      ],
+      "@smarthContracts/*": [
+        "src/utils/smarthContracts/*",
+        "*.json"
       ],
       // "@/*": [
       //   "./*"
@@ -43,6 +48,6 @@
     "@types/**/*.ts",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }

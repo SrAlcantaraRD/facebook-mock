@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "compile": "npx hardhat compile && yarn test",
+    "compile": "npx hardhat compile && yarn test && yarn copy-artifacts-to-front",
     "test": "npx hardhat test",
-    "deploy": "yarn compile && npx hardhat run scripts/deploy.ts --network localhost",
+    "deploy": "npx hardhat run scripts/deploy.ts --network localhost",
     "start-serve": "npx hardhat node",
     "start-front": "cd vue-app/ && yarn serve",
-    "open-console": " npx hardhat console"
+    "open-console": " npx hardhat console",
+    "copy-artifacts-to-front": "cp -r artifacts/contracts/* vue-app/src/utils/smarthContracts/"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",

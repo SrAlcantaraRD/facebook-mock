@@ -19,11 +19,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+
 export default defineComponent({
   name: "AppBar",
   computed: {
     address() {
-      return this.$store.state.address;
+      return this.$store.getters.getSignerAddress;
     },
   },
 });
