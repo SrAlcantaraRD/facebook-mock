@@ -9,19 +9,15 @@
 <script lang="ts">
 import AppBar from "@/components/AppBar.vue";
 
-export default {
-  components: {
-    AppBar,
-  },
-  data() {
-    return {
-      msg: "This is demo net work",
-    };
-  },
+import { Options, Vue } from "vue-class-component";
+
+@Options({
+  components: { AppBar },
   async mounted() {
     await this.$store.dispatch("connect", { connect: true });
   },
-};
+})
+export default class App extends Vue {}
 </script>
 
 <style>

@@ -3,7 +3,8 @@
     <div
       class="flex-none flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
     >
-      <router-link to="/">Home</router-link> |
+      <router-link to="/loadImage">LoadImage</router-link>
+      <router-link to="/">Home</router-link>
       <router-link to="/about">About</router-link>
     </div>
     <div
@@ -18,23 +19,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { Options, Vue } from "vue-class-component";
 
-export default defineComponent({
-  name: "AppBar",
+@Options({
+  components: {},
   computed: {
     address() {
       return this.$store.getters.getSignerAddress;
     },
     decentragram() {
-      console.log("klk");
-
       return this.$store.getters.getDecentragram;
     },
   },
-});
+})
+export default class AppBar extends Vue {}
 </script>
->
 
 <style scoped>
 #panel-container {
