@@ -3,9 +3,13 @@
     <div
       class="flex-none flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
     >
-      <router-link to="/loadImage">LoadImage</router-link>
-      <router-link to="/">Home</router-link>
-      <router-link to="/about">About</router-link>
+      <router-link :to="item.to" v-for="item in items" :key="item.label">
+        <div
+          class="flex align-items-center justify-content-center h-4rem font-bold text-white border-round m-2 p-2"
+        >
+          {{ item.label }}
+        </div>
+      </router-link>
     </div>
     <div
       class="flex-grow-1 flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
@@ -23,12 +27,27 @@ import { Options, Vue } from "vue-class-component";
 
 @Options({
   components: {},
+  data() {
+    return {
+      items: [
+        {
+          to: "/",
+          label: "Home",
+        },
+        {
+          to: "/loadImage",
+          label: "LoadImage",
+        },
+        {
+          to: "/about",
+          label: "About",
+        },
+      ],
+    };
+  },
   computed: {
     address() {
       return this.$store.getters.getSignerAddress;
-    },
-    decentragram() {
-      return this.$store.getters.getDecentragram;
     },
   },
 })
