@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
+import LoadImage from "../views/LoadImage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Home",
     component: Home,
+  },
+  {
+    path: "/loadImage",
+    name: "LoadImage",
+    component: LoadImage,
   },
   {
     path: "/about",
