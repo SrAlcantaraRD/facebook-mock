@@ -22,6 +22,8 @@ async function main() {
 
   const stream = fs.createWriteStream("vue-app/.env");
 
+  // TODO: Configurar esto para que "añada" el valor de la dirección del contrato en vez de eliminar todo el fichero
+  // Trabajar con varios entornos: LOCAL y Goerli (para que se pueda usar en la web deste otros dispotivos)
   stream.once("open", function (fd) {
     stream.write(
       `VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS="${decentragram.address}"\n`
