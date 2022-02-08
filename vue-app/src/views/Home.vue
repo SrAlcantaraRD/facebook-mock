@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    QmNRCQWfgze6AbBCaT1rkrkV5tJ2aP4oTNPb5JZcXYywve
     <span v-html="addressImage"></span>
   </div>
 </template>

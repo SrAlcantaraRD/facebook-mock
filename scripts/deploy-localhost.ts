@@ -20,7 +20,9 @@ async function main() {
 
   await decentragram.deployed();
 
-  const stream = fs.createWriteStream("vue-app/.env.goerli.staging");
+  const stream = fs.createWriteStream("vue-app/.env.local", {
+    overwrite: false,
+  });
 
   // TODO: Configurar esto para que "añada" el valor de la dirección del contrato en vez de eliminar todo el fichero
   // Trabajar con varios entornos: LOCAL y Goerli (para que se pueda usar en la web deste otros dispotivos)

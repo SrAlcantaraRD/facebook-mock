@@ -12,6 +12,7 @@ interface IStore {
   decentragram: Decentragram;
   error: string;
 }
+
 const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
 
 export const store = createStore<IStore>({
@@ -102,6 +103,7 @@ export const store = createStore<IStore>({
         DecentragramContract.abi,
         signer
       );
+      console.log({ decentragramContract });
 
       const images = await decentragramContract.functions.imageCounter();
       console.log(images);
