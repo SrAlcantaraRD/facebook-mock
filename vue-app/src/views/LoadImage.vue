@@ -12,7 +12,12 @@
       <div class="field col-12">
         <span class="p-float-label p-input-icon-left">
           <i class="pi pi-search" />
-          <InputText id="inputtext-right" type="text" v-model="imageHash" />
+          <InputText
+            id="inputtext-right"
+            type="text"
+            v-model="imageHash"
+            disabled
+          />
           <label for="inputtext-right">Hash</label>
         </span>
       </div>
@@ -28,12 +33,14 @@
 
 <script lang="ts">
 import { toSvg } from "jdenticon";
+import DecentragramContract from "@/utils/smarthContracts/Decentragram.sol/Decentragram.json";
 
 import FileUpload from "primevue/fileupload";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import { Options, Vue } from "vue-class-component";
 import * as _ from "lodash";
+import { ethers } from "ethers";
 
 @Options({
   name: "LoadImagePage",
@@ -44,6 +51,7 @@ import * as _ from "lodash";
       imageContent: null,
       imageHash: null,
       imageDescription: null,
+      decentragramContract: null,
     };
   },
   computed: {},
@@ -64,6 +72,7 @@ import * as _ from "lodash";
 
       this.imageHash = _hex;
       this.imageContent = toSvg(_hex, 200);
+      this.getDecentragram();
     },
     uploadToSmartcontract(event) {
       const files = event.dataTransfer
@@ -90,6 +99,44 @@ import * as _ from "lodash";
         .join("");
 
       return hex;
+    },
+    async getDecentragram() {
+      const {
+        VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS,
+        VUE_APP_GOERLI_DECENTRAGRAM_CONTRACT_ADDRESS,
+      } = process.env;
+      const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
+
+      const networkName = (await PROVIDER.getNetwork()).name;
+      const signer = PROVIDER.getSigner();
+      const address = await signer.getAddress();
+
+      const contractAddress =
+        networkName === "goerli"
+          ? VUE_APP_GOERLI_DECENTRAGRAM_CONTRACT_ADDRESS
+          : VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS;
+
+      const decentragramContract = new ethers.Contract(
+        contractAddress,
+        DecentragramContract.abi,
+        signer
+      );
+
+      const images = await decentragramContract.functions.imageCounter();
+      console.log(images);
+
+      try {
+        const _contract = this.$store.getters.getDecentragram;
+        console.log({ _contract: _contract });
+
+        const image2s = await _contract.functions;
+        console.log(image2s);
+      } catch (error) {
+        console.log({ error });
+      }
+
+      // this.decentragramContract = _contract;
+      // return _contract;
     },
   },
 })

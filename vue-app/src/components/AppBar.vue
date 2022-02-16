@@ -1,23 +1,34 @@
 <template>
   <div id="panel-container" class="flex">
     <div
-      class="flex-none flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
+      class="flex-none flex align-items-center justify-content-center font-bold px-5 py-3 border-round"
     >
       <router-link :to="item.to" v-for="item in items" :key="item.label">
         <div
-          class="flex align-items-center justify-content-center h-4rem font-bold text-white border-round m-2 p-2"
+          class="flex align-items-center justify-content-center h-4rem font-bold text-white border-round p-2"
         >
           {{ item.label }}
         </div>
       </router-link>
     </div>
     <div
-      class="flex-grow-1 flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
+      class="flex-grow-1 flex align-items-center justify-content-center font-bold px-5 py-3 border-round"
     />
     <div
-      class="flex-none flex align-items-center justify-content-center font-bold m-2 px-5 py-3 border-round"
+      class="flex-none flex align-items-center justify-content-center font-bold px-5 py-3 border-round"
     >
-      <div class="p-text-justify">{{ address }}</div>
+      <div class="flex flex-column card-container green-container">
+        <div class="flex align-items-center justify-content-center">
+          <p class="p-text-justify">
+            <span class="font-bold">address:</span> {{ address }}
+          </p>
+        </div>
+        <div class="flex align-items-center justify-content-center">
+          <p class="p-text-justify">
+            <span class="font-bold">Balance:</span> {{ balance }} ethers
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -32,11 +43,11 @@ import { Options, Vue } from "vue-class-component";
       items: [
         {
           to: "/",
-          label: "Home",
+          label: "Inicio",
         },
         {
           to: "/loadImage",
-          label: "LoadImage",
+          label: "Cargar Imagen",
         },
         {
           to: "/about",
@@ -48,6 +59,9 @@ import { Options, Vue } from "vue-class-component";
   computed: {
     address() {
       return this.$store.getters.getSignerAddress;
+    },
+    balance() {
+      return this.$store.getters.getBalance;
     },
   },
 })

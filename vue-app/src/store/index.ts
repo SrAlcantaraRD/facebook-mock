@@ -11,9 +11,14 @@ interface IStore {
   clicks: number;
   decentragram: Decentragram;
   error: string;
+  signerBalance: string;
+  web3: Web3;
 }
 
 const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
+const web3 = new Web3("http://127.0.0.1:8545/");
+console.log(web3);
+// console.log({ c });
 
 export const store = createStore<IStore>({
   state: {
@@ -21,6 +26,8 @@ export const store = createStore<IStore>({
     decentragram: null,
     error: null,
     signerAddress: null,
+    signerBalance: null,
+    web3: web3,
   },
   mutations: {
     setClicks(state) {
@@ -35,6 +42,9 @@ export const store = createStore<IStore>({
     setSignerAddress(state, _signerAddress: string) {
       state.signerAddress = _signerAddress;
     },
+    setSignerBalance(state, _signerBalance: string) {
+      state.signerBalance = _signerBalance;
+    },
   },
   getters: {
     getClicks({ clicks }) {
@@ -48,6 +58,9 @@ export const store = createStore<IStore>({
     },
     getSignerAddress({ signerAddress }) {
       return signerAddress;
+    },
+    getBalance({ signerBalance }) {
+      return signerBalance;
     },
   },
   actions: {
@@ -73,11 +86,12 @@ export const store = createStore<IStore>({
         window.ethereum.on("accountsChanged", async () => {
           await dispatch("loadSmartContractData");
           await dispatch("buildDecentragram");
+          await dispatch("loadUserData");
         });
-        console.log("¡Conectado!");
 
         await dispatch("loadSmartContractData");
         await dispatch("buildDecentragram");
+        await dispatch("loadUserData");
 
         commit("setError", "Execute connection to ethereum process.");
       } catch (error) {
@@ -96,20 +110,27 @@ export const store = createStore<IStore>({
     },
     async loadSmartContractData({ commit }) {
       const signer = PROVIDER.getSigner();
-      const address = await signer.getAddress();
 
       const decentragramContract = new ethers.Contract(
         VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS,
         DecentragramContract.abi,
         signer
       );
-      console.log({ decentragramContract });
 
       const images = await decentragramContract.functions.imageCounter();
-      console.log(images);
 
       commit("setDecentragram", decentragramContract);
+    },
+
+    async loadUserData({ commit, state }) {
+      const signer = PROVIDER.getSigner();
+      const address = await signer.getAddress();
+
+      const _signerBalance = await signer.getBalance();
+      const ammout = web3.utils.fromWei(_signerBalance.toString(), "ether");
+
       commit("setSignerAddress", address);
+      commit("setSignerBalance", ammout);
     },
   },
   modules: {},

@@ -8,7 +8,7 @@
     "deploy-localhost": "npx hardhat run scripts/deploy-localhost.ts --network localhost",
     "deploy-goerli": "npx hardhat run scripts/deploy.ts  --network goerli",
     "start-serve": "npx hardhat node",
-    "start-front": "cd vue-app/ && yarn serve",
+    "start-front": "cd vue-app && yarn serve",
     "open-console": " npx hardhat console",
     "copy-artifacts-to-front": "cp -r artifacts/contracts/* vue-app/src/utils/smarthContracts/"
   },
