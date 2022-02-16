@@ -24,8 +24,11 @@
       <div class="field col-12">
         <span v-html="imageContent"></span>
       </div>
+      <div class="field col-12" v-if="error">
+        <label for="inputtext-right">{{ error }}</label>
+      </div>
       <div class="field col-12 md:col-12">
-        <Button label="Submit" @click="loadImage" />
+        <Button label="Submit" @click="uploadToSmartcontract" />
       </div>
     </div>
   </div>
@@ -33,14 +36,12 @@
 
 <script lang="ts">
 import { toSvg } from "jdenticon";
-import DecentragramContract from "@/utils/smarthContracts/Decentragram.sol/Decentragram.json";
-
+import * as _ from "lodash";
 import FileUpload from "primevue/fileupload";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import { Options, Vue } from "vue-class-component";
-import * as _ from "lodash";
-import { ethers } from "ethers";
+import { Decentragram } from "../../../typechain/Decentragram";
 
 @Options({
   name: "LoadImagePage",
@@ -51,7 +52,7 @@ import { ethers } from "ethers";
       imageContent: null,
       imageHash: null,
       imageDescription: null,
-      decentragramContract: null,
+      error: null,
     };
   },
   computed: {},
@@ -72,18 +73,9 @@ import { ethers } from "ethers";
 
       this.imageHash = _hex;
       this.imageContent = toSvg(_hex, 200);
-      this.getDecentragram();
+      this.error = null;
     },
-    uploadToSmartcontract(event) {
-      const files = event.dataTransfer
-        ? event.dataTransfer.files
-        : event.target.files;
-      console.log({ files });
 
-      // const data = await this.IPFS.add(event.files);
-      // this.imageHash = data.hash;
-      // console.log(data);
-    },
     async hash(message: string) {
       const text_encoder = new TextEncoder();
       const data = text_encoder.encode(message);
@@ -91,6 +83,7 @@ import { ethers } from "ethers";
 
       return message_digest;
     },
+
     in_hex(data: ArrayBuffer) {
       const octets = new Uint8Array(data);
 
@@ -100,43 +93,24 @@ import { ethers } from "ethers";
 
       return hex;
     },
-    async getDecentragram() {
-      const {
-        VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS,
-        VUE_APP_GOERLI_DECENTRAGRAM_CONTRACT_ADDRESS,
-      } = process.env;
-      const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
 
-      const networkName = (await PROVIDER.getNetwork()).name;
-      const signer = PROVIDER.getSigner();
-      const address = await signer.getAddress();
-
-      const contractAddress =
-        networkName === "goerli"
-          ? VUE_APP_GOERLI_DECENTRAGRAM_CONTRACT_ADDRESS
-          : VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS;
-
-      const decentragramContract = new ethers.Contract(
-        contractAddress,
-        DecentragramContract.abi,
-        signer
+    async uploadToSmartcontract() {
+      this.error = null;
+      const decentragramContract: Decentragram = await this.$store.dispatch(
+        "getDecentragramContract"
       );
 
-      const images = await decentragramContract.functions.imageCounter();
-      console.log(images);
-
       try {
-        const _contract = this.$store.getters.getDecentragram;
-        console.log({ _contract: _contract });
-
-        const image2s = await _contract.functions;
+        const image2s = await decentragramContract.functions.uploadImages(
+          this.imageHash,
+          this.imageDescription
+        );
+        await this.$store.dispatch("loadUserData");
         console.log(image2s);
       } catch (error) {
         console.log({ error });
+        this.error = `${error.message} | code (${error.code})`;
       }
-
-      // this.decentragramContract = _contract;
-      // return _contract;
     },
   },
 })

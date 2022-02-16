@@ -9,7 +9,6 @@ const { VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS } = process.env;
 interface IStore {
   signerAddress: string;
   clicks: number;
-  decentragram: Decentragram;
   error: string;
   signerBalance: string;
   web3: Web3;
@@ -23,7 +22,6 @@ console.log(web3);
 export const store = createStore<IStore>({
   state: {
     clicks: 1,
-    decentragram: null,
     error: null,
     signerAddress: null,
     signerBalance: null,
@@ -32,9 +30,6 @@ export const store = createStore<IStore>({
   mutations: {
     setClicks(state) {
       state.clicks++;
-    },
-    setDecentragram(state, _decentragram: Decentragram) {
-      state.decentragram = _decentragram;
     },
     setError(state, _error: string) {
       state.error = _error;
@@ -49,9 +44,6 @@ export const store = createStore<IStore>({
   getters: {
     getClicks({ clicks }) {
       return clicks;
-    },
-    getDecentragram({ decentragram }) {
-      return decentragram;
     },
     getError({ error }) {
       return error;
@@ -84,12 +76,10 @@ export const store = createStore<IStore>({
         }
 
         window.ethereum.on("accountsChanged", async () => {
-          await dispatch("loadSmartContractData");
           await dispatch("buildDecentragram");
           await dispatch("loadUserData");
         });
 
-        await dispatch("loadSmartContractData");
         await dispatch("buildDecentragram");
         await dispatch("loadUserData");
 
@@ -108,7 +98,8 @@ export const store = createStore<IStore>({
     async requestAccess() {
       await PROVIDER.send("eth_requestAccounts", []);
     },
-    async loadSmartContractData({ commit }) {
+
+    getDecentragramContract() {
       const signer = PROVIDER.getSigner();
 
       const decentragramContract = new ethers.Contract(
@@ -117,12 +108,10 @@ export const store = createStore<IStore>({
         signer
       );
 
-      const images = await decentragramContract.functions.imageCounter();
-
-      commit("setDecentragram", decentragramContract);
+      return decentragramContract;
     },
 
-    async loadUserData({ commit, state }) {
+    async loadUserData({ commit }) {
       const signer = PROVIDER.getSigner();
       const address = await signer.getAddress();
 
