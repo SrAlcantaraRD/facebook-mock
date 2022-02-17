@@ -28,7 +28,11 @@
         <label for="inputtext-right">{{ error }}</label>
       </div>
       <div class="field col-12 md:col-12">
-        <Button label="Submit" @click="uploadToSmartcontract" />
+        <Button
+          label="Submit"
+          @click="uploadToSmartcontract"
+          :loading="loading"
+        />
       </div>
     </div>
   </div>
@@ -53,12 +57,14 @@ import { Decentragram } from "../../../typechain/Decentragram";
       imageHash: null,
       imageDescription: null,
       error: null,
+      loading: false,
     };
   },
   computed: {},
   watch: {
     // cada vez que la descripcion cambia, se actualiza el hash y con este, la imagen relacionada con el hash
     imageDescription: function () {
+      this.loading = true;
       this.debouncedUpdateHash();
     },
   },
@@ -74,6 +80,7 @@ import { Decentragram } from "../../../typechain/Decentragram";
       this.imageHash = _hex;
       this.imageContent = toSvg(_hex, 200);
       this.error = null;
+      this.loading = false;
     },
 
     async hash(message: string) {
@@ -96,6 +103,8 @@ import { Decentragram } from "../../../typechain/Decentragram";
 
     async uploadToSmartcontract() {
       this.error = null;
+      this.loading = true;
+
       const decentragramContract: Decentragram = await this.$store.dispatch(
         "getDecentragramContract"
       );
@@ -105,11 +114,14 @@ import { Decentragram } from "../../../typechain/Decentragram";
           this.imageHash,
           this.imageDescription
         );
-        await this.$store.dispatch("loadUserData");
         console.log(image2s);
       } catch (error) {
         console.log({ error });
         this.error = `${error.message} | code (${error.code})`;
+      } finally {
+        this.loading = false;
+
+        await this.$store.dispatch("loadUserData");
       }
     },
   },

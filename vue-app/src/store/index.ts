@@ -1,8 +1,9 @@
 import DecentragramContract from "@/utils/smarthContracts/Decentragram.sol/Decentragram.json";
 import { Decentragram } from "@contractsTypes/Decentragram";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { createStore } from "vuex";
 import Web3 from "web3";
+import { toSvg } from "jdenticon";
 
 const { VUE_APP_DECENTRAGRAM_CONTRACT_ADDRESS } = process.env;
 
@@ -12,6 +13,15 @@ interface IStore {
   error: string;
   signerBalance: string;
   web3: Web3;
+  images: Image[];
+}
+
+interface Image {
+  id: BigNumber;
+  hash: string;
+  description: string;
+  tipAmount: BigNumber;
+  autor: string;
 }
 
 const PROVIDER = new ethers.providers.Web3Provider(window.ethereum);
@@ -26,6 +36,7 @@ export const store = createStore<IStore>({
     signerAddress: null,
     signerBalance: null,
     web3: web3,
+    images: [],
   },
   mutations: {
     setClicks(state) {
@@ -40,6 +51,9 @@ export const store = createStore<IStore>({
     setSignerBalance(state, _signerBalance: string) {
       state.signerBalance = _signerBalance;
     },
+    setSignerImages(state, _images: Image[]) {
+      state.images = _images;
+    },
   },
   getters: {
     getClicks({ clicks }) {
@@ -53,6 +67,9 @@ export const store = createStore<IStore>({
     },
     getBalance({ signerBalance }) {
       return signerBalance;
+    },
+    getSignerImages({ images }) {
+      return images;
     },
   },
   actions: {
@@ -118,8 +135,32 @@ export const store = createStore<IStore>({
       const _signerBalance = await signer.getBalance();
       const ammout = web3.utils.fromWei(_signerBalance.toString(), "ether");
 
+      const decentragramContract: Decentragram = await this.dispatch(
+        "getDecentragramContract"
+      );
+
+      const images = [];
+      const imagesCounter = Number(await decentragramContract.imageCounter());
+      console.log({ imagesCounter });
+
+      for (let index = 0; index <= imagesCounter - 1; index++) {
+        const image = await decentragramContract.images(index);
+        const tipAmmout = web3.utils.fromWei(image[3].toString(), "ether");
+
+        images.push({
+          id: Number(image.id),
+          hash: image.hash,
+          description: image.description,
+          tipAmount: Number(tipAmmout),
+          autor: image.autor,
+          imageContent: toSvg(image.hash, 200),
+        });
+      }
+      console.log({ images });
+
       commit("setSignerAddress", address);
       commit("setSignerBalance", ammout);
+      commit("setSignerImages", images);
     },
   },
   modules: {},
